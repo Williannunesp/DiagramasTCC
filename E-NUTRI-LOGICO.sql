@@ -33,9 +33,9 @@ CREATE TABLE TelRes (
 );
 
 CREATE TABLE Endereco (
-    CodEndereco Serial PRIMARY KEY,
+    CodEndereco Integer PRIMARY KEY,
     Numero Numeric(5) NOT NULL,
-    FK_Cep_CodCep Serial,
+    FK_Cep_CodCep Integer,
     FK_Bairro_CodBairro Integer,
     FK_Rua_CodRua Integer,
     UNIQUE (CodEndereco, Numero, FK_Cep_CodCep, FK_Bairro_CodBairro, FK_Rua_CodRua)
@@ -54,22 +54,23 @@ CREATE TABLE Bairro (
 );
 
 CREATE TABLE UF (
-    CodUf Serial PRIMARY KEY,
+    CodUf Integer PRIMARY KEY,
     Nome Varchar(50) NOT NULL,
-    UNIQUE (CodUf, Nome)
+    Sigla Varchar(2) NOT NULL,
+    UNIQUE (CodUf, Nome, Sigla)
 );
 
 CREATE TABLE Cidade (
-    CodCidade Serial PRIMARY KEY,
+    CodCidade Integer PRIMARY KEY,
     Campo Varchar(50),
     FK_UF_CodUf Integer,
     UNIQUE (CodCidade, FK_UF_CodUf)
 );
 
 CREATE TABLE Cep (
-    CodCep Serial PRIMARY KEY,
-    Numero Numeric(8),
-    FK_Cidade_CodCidade Serial,
+    CodCep Integer PRIMARY KEY,
+    Numero Numeric(8) NOT NULL,
+    FK_Cidade_CodCidade Integer,
     UNIQUE (CodCep, Numero, FK_Cidade_CodCidade)
 );
 
@@ -117,11 +118,9 @@ CREATE TABLE Objetivo (
 );
 
 CREATE TABLE TipoCirurgia (
-    CodTipoCirur Serial PRIMARY KEY,
-    Nome Varchar(50) NOT NULL,
-    FK_CirurRec_CodCirurgiaRec Integer,
-    fk_Questionario_FK_Paciente_CodPaciente Integer,
-    UNIQUE (FK_CirurRec_CodCirurgiaRec, Nome)
+    CodTipoCirur Integer PRIMARY KEY,
+    Nome Varchar(50) NOT NULL UNIQUE,
+    fk_Questionario_FK_Paciente_CodPaciente Integer
 );
 
 CREATE TABLE DietaEmagrecer (
@@ -140,20 +139,20 @@ CREATE TABLE IdadeD1 (
 );
 
 CREATE TABLE ConsegEmagrecer (
-    CodConsegEmagrecer Integer PRIMARY KEY,
+    CodConsEmag Integer PRIMARY KEY,
     Resposta Boolean  NOT NULL,
     FK_IdadeD1_CodIdadeD1 Serial,
-    UNIQUE (CodConsegEmagrecer, Resposta, FK_IdadeD1_CodIdadeD1)
+    UNIQUE (CodConsEmag, Resposta, FK_IdadeD1_CodIdadeD1)
 );
 
 CREATE TABLE KgEmag (
     CodKgEmag Integer PRIMARY KEY,
-    Kg Decimal(2,1)  NOT NULL,
+    Kg Decimal(3,2)  NOT NULL,
     FK_ConsegEmagrecer_CodConsegEmagrecer Integer,
     UNIQUE (CodKgEmag, Kg, FK_ConsegEmagrecer_CodConsegEmagrecer)
 );
 
-CREATE TABLE Recurperou (
+CREATE TABLE Recuperou (
     CodRec Integer PRIMARY KEY,
     Resposta Boolean  NOT NULL,
     FK_KgEmag_CodKgEmag Integer,
@@ -214,7 +213,7 @@ CREATE TABLE AnamneseMedSupAn (
 CREATE TABLE MedSup (
     CodMedSup Integer PRIMARY KEY,
     Tipo Varchar(20)  NOT NULL,
-    Descricao Varchar(255)  NOT NULL,
+    Descricao Varchar(255) ,
     UNIQUE (CodMedSup, Tipo)
 );
 
@@ -725,15 +724,15 @@ ALTER TABLE ConsegEmagrecer ADD CONSTRAINT FK_ConsegEmagrecer_3
  
 ALTER TABLE KgEmag ADD CONSTRAINT FK_KgEmag_3
     FOREIGN KEY (FK_ConsegEmagrecer_CodConsegEmagrecer)
-    REFERENCES ConsegEmagrecer (CodConsegEmagrecer);
+    REFERENCES ConsegEmagrecer (CodConsEmag);
  
-ALTER TABLE Recurperou ADD CONSTRAINT FK_Recurperou_3
+ALTER TABLE Recuperou ADD CONSTRAINT FK_Recuperou_3
     FOREIGN KEY (FK_KgEmag_CodKgEmag)
     REFERENCES KgEmag (CodKgEmag);
  
 ALTER TABLE KgRec ADD CONSTRAINT FK_KgRec_3
     FOREIGN KEY (FK_Recuperou_CodRecuperou)
-    REFERENCES Recurperou (CodRec);
+    REFERENCES Recuperou (CodRec);
  
 ALTER TABLE QuestAntecedenteP ADD CONSTRAINT FK_QuestAntecedenteP_2
     FOREIGN KEY (FK_Questionario_CodQuestionario)
